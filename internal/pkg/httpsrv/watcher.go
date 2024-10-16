@@ -21,6 +21,10 @@ func (s *Server) removeWatcher(w *watcher.Watcher) {
 	}
 	// Remove watcher.
 	delete(s.watchers, w.GetWatcherId())
+
+	s.statsLock.Lock()
+	delete(s.sessionStats, w.GetWatcherId()) //Problem #2: Free up memory by deleting stats after session ends
+	s.statsLock.Unlock()
 }
 
 func (s *Server) notifyWatchers(str string) {

@@ -57,6 +57,10 @@ func (w *Watcher) Stop() {
 
 	close(w.quitChannel)
 	w.running.Wait()
+
+	// Problem #2: release resources and prevent goroutines from getting stuck while waiting on these channels.
+	close(w.inCh)
+	close(w.outCh)
 }
 
 func (w *Watcher) GetWatcherId() string { return w.id }
