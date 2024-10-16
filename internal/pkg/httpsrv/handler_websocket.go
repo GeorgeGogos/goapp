@@ -40,6 +40,13 @@ func (s *Server) handlerWebSocket(w http.ResponseWriter, r *http.Request) {
 	log.Printf("websocket started for watcher %s\n", watch.GetWatcherId())
 	defer func() {
 		log.Printf("websocket stopped for watcher %s\n", watch.GetWatcherId())
+
+		//Problem #1: Print the total number of messages received for the session
+		s.statsLock.RLock()
+		if stat, exists := s.sessionStats[watch.GetWatcherId()]; exists {
+			stat.print()
+		}
+		s.statsLock.RUnlock()
 	}()
 
 	// Read done.
