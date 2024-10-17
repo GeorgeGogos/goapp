@@ -37,8 +37,32 @@ func (s *Server) myRoutes() []Route {
 	}
 }
 
-func (s *Server) handlerWrapper(handlerFunc func(http.ResponseWriter, *http.Request)) http.Handler {
+// Problem #2: Adding CSRF Token Verification
+func CSRFTokenMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Extract CSRF token from the request header
+		csrfToken := r.Header.Get("X-CSRF-Token")
+
+		// Validate the presence of the CSRF token
+		if csrfToken == "" {
+			http.Error(w, "Missing CSRF token", http.StatusForbidden)
+			return
+		}
+
+		// Validate the CSRF token (static token)
+		validToken := "valid_csrf_token"
+		if csrfToken != validToken {
+			http.Error(w, "Invalid CSRF token", http.StatusForbidden)
+			return
+		}
+
+		// If the token is valid, proceed to the next handler
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) handlerWrapper(handlerFunc func(http.ResponseWriter, *http.Request)) http.Handler {
+	return CSRFTokenMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			r := recover()
 			if r != nil {
@@ -46,5 +70,5 @@ func (s *Server) handlerWrapper(handlerFunc func(http.ResponseWriter, *http.Requ
 			}
 		}()
 		handlerFunc(w, r)
-	})
+	}))
 }
