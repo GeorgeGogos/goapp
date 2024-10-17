@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/GeorgeGogos/goaap/internal/pkg/watcher"
-
+	"github.com/GeorgeGogos/goaap/pkg/util"
 	"github.com/gorilla/websocket"
 )
 
@@ -85,8 +85,12 @@ func (s *Server) handlerWebSocket(w http.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case cv := <-watch.Recv():
-			data, _ := json.Marshal(cv)
-			err = c.WriteMessage(websocket.TextMessage, data)
+			//data, _ := json.Marshal(cv)
+
+			//New Feature #2: Generate a new random HEX string value and print it
+			randHexValue := util.RandHexString(16)
+			response := fmt.Sprintf("{\"iteration\": %d, \"value\": \"%s\"}", cv.Iteration, randHexValue)
+			err = c.WriteMessage(websocket.TextMessage, []byte(response))
 			if err != nil {
 				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 					log.Printf("failed to write message: %v\n", err)
