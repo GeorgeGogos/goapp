@@ -20,7 +20,7 @@ Initial version.
 
 ## Problem #3: Add CSRF Token Verification
 - **File**: `internal/pkg/httpsrv/watcher.go`, `internal/pkg/watcher/watcher.go`
-  - Added a CSRF middleware (`CSRFTokenMiddleware`) to validate incoming requests for a CSRF token (static Token = `valid_csrf_token`. Updated handler wrappers to enforce CSRF token verification for all routes.
+  - Added a CSRF middleware (`CSRFTokenMiddleware`) to validate incoming requests for a CSRF token (static Token = `valid_csrf_token`). Updated handler wrappers to enforce CSRF token verification for all routes.
 
 ## New Feature #2: Return Hex Value in WS Connection
 - **File**: `internal/pkg/httpsrv/handler_websocket.go`, `pkg/util/string.go`
